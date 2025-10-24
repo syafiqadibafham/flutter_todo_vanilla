@@ -1,0 +1,21 @@
+name: flutter_todo_vanilla
+description: "A simple To-Do application built with Flutter."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  build_runner: ^2.10.0
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+  mockito: ^5.5.1
+
+flutter:
+  uses-material-design: true
