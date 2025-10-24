@@ -1,45 +1,87 @@
-// import 'package:dio/dio.dart';
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:mockito/annotations.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_todo_vanilla/logic/todo_logic.dart';
+import 'package:flutter_todo_vanilla/model/todo.dart';
 
-// // Generate a MockDio class with the same API as the Dio class.
-// @GenerateMocks([Dio])
-// import 'unit_test.mocks.dart';
+void main() {
+  group('TodoController', () {
+    late TodoController todoController;
 
-// void main() {
-//   group('Repository', () {
-//     late dynamic repository;
-//     late MockDio mockDio;
+    setUp(() {
+      todoController = TodoController();
+    });
 
-//     setUp(() {
-//       mockDio = MockDio();
-//       //repository = EmployeesRepository(dio: mockDio);
-//     });
+    test('Initial values are correct', () {
+      expect(todoController.todos.value, []);
+      expect(todoController.filter.value, ToDoFilters.all);
+    });
 
-//     // test('getEmployees returns a list of employees', () async {
-//     //   // Since getEmployees is currently mocked with a delay and a static list,
-//     //   // we are not testing the dio interaction here, but the method itself.
-//     //   // When a real API is implemented, this test will need to be updated
-//     //   // to mock the dio response.
-//     //   final employees = await repository.getEmployees();
-//     //   expect(employees, isA<List<String>>());
-//     //   expect(employees.isNotEmpty, isTrue);
-//     // });
+    test('addTask adds a new todo', () {
+      todoController.textController.text = 'Test Task';
+      todoController.addTask();
+      expect(todoController.todos.value.length, 1);
+      expect(todoController.todos.value.first.title, 'Test Task');
+      expect(todoController.textController.text, '');
+    });
 
-//     // test('searchEmployees returns filtered list for a query', () async {
-//     //   final query = 'Alice';
-//     //   final employees = await repository.searchEmployees(query);
-//     //   expect(employees, isA<List<String>>());
-//     //   expect(employees.length, 1);
-//     //   expect(employees.first, 'Alice Johnson');
-//     // });
+    test('addTask does not add an empty todo', () {
+      todoController.textController.text = '  ';
+      todoController.addTask();
+      expect(todoController.todos.value.isEmpty, isTrue);
+    });
 
-//     // test('searchEmployees returns all employees for an empty query', () async {
-//     //   final query = '';
-//     //   final employees = await repository.searchEmployees(query);
-//     //   expect(employees, isA<List<String>>());
-//     //   // Should be the full list
-//     //   expect(employees.length, 8);
-//     // });
-//   });
-// }
+    test('toggleDone toggles the done status of a todo', () {
+      todoController.todos.value = [ToDo(title: 'Test Task')];
+      expect(todoController.todos.value.first.done, isFalse);
+      todoController.toggleDone(0);
+      expect(todoController.todos.value.first.done, isTrue);
+      todoController.toggleDone(0);
+      expect(todoController.todos.value.first.done, isFalse);
+    });
+
+    test('removeTodo removes a todo from the list', () {
+      todoController.todos.value = [ToDo(title: 'Test Task')];
+      expect(todoController.todos.value.length, 1);
+      todoController.removeTodo(0);
+      expect(todoController.todos.value.isEmpty, isTrue);
+    });
+
+    test('toggleFilter changes the filter value', () {
+      expect(todoController.filter.value, ToDoFilters.all);
+      todoController.toggleFilter(ToDoFilters.completed);
+      expect(todoController.filter.value, ToDoFilters.completed);
+    });
+
+    group('filterList', () {
+      setUp(() {
+        todoController.todos.value = [
+          ToDo(title: 'Task 1', done: false),
+          ToDo(title: 'Task 2', done: true),
+          ToDo(title: 'Task 3', done: false),
+        ];
+      });
+
+      test('returns all todos when filter is all', () {
+        todoController.filter.value = ToDoFilters.all;
+        expect(todoController.filterList.length, 3);
+      });
+
+      test('returns only ongoing todos when filter is ongoing', () {
+        todoController.filter.value = ToDoFilters.ongoing;
+        final filteredList = todoController.filterList;
+        expect(filteredList.length, 2);
+        expect(filteredList.every((todo) => !todo.done), isTrue);
+      });
+
+      test('returns only completed todos when filter is completed', () {
+        todoController.filter.value = ToDoFilters.completed;
+        final filteredList = todoController.filterList;
+        expect(filteredList.length, 1);
+        expect(filteredList.every((todo) => todo.done), isTrue);
+      });
+    });
+
+    tearDown(() {
+      todoController.dispose();
+    });
+  });
+}
