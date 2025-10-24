@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_todo_vanilla/logic/todo_logic.dart';
 
 class ToDoHomePage extends StatelessWidget {
-  final TodoController controller = TodoController();
+  final TodoController controller;
 
-  ToDoHomePage({super.key});
+  const ToDoHomePage({super.key, required this.controller});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,13 +16,13 @@ class ToDoHomePage extends StatelessWidget {
             spacing: 8,
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(10.0),
                 child: Row(
                   children: [
                     Expanded(
                       child: TextField(
                         controller: controller.textController,
-                        decoration: const InputDecoration(labelText: 'Neue Aufgabe'),
+                        decoration: const InputDecoration(labelText: 'New Task'),
                         onSubmitted: (_) => controller.addTask(),
                       ),
                     ),
